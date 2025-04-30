@@ -10,6 +10,12 @@ import './index.css';
 import {$isCodeNode} from '@lexical/code';
 import {$getNearestNodeFromDOMNode, LexicalEditor} from 'lexical';
 import {Options} from 'prettier';
+import * as babelParser from 'prettier/parser-babel';
+import * as htmlParser from 'prettier/parser-html';
+import * as markdownParser from 'prettier/parser-markdown';
+import * as postcssParser from 'prettier/parser-postcss';
+import * as typescriptParser from 'prettier/parser-typescript';
+import {format} from 'prettier/standalone';
 import {useState} from 'react';
 
 interface Props {
@@ -19,32 +25,17 @@ interface Props {
 }
 
 const PRETTIER_PARSER_MODULES = {
-  css: [() => import('prettier/parser-postcss')],
-  html: [() => import('prettier/parser-html')],
-  js: [
-    () => import('prettier/parser-babel'),
-    () => import('prettier/plugins/estree.js'),
-  ],
-  markdown: [() => import('prettier/parser-markdown')],
-  typescript: [
-    () => import('prettier/parser-typescript'),
-    () => import('prettier/plugins/estree.js'),
-  ],
+  css: [postcssParser],
+  html: [htmlParser],
+  js: [babelParser],
+  markdown: [markdownParser],
+  typescript: [typescriptParser],
 } as const;
 
 type LanguagesType = keyof typeof PRETTIER_PARSER_MODULES;
 
-async function loadPrettierParserByLang(lang: string) {
-  const dynamicImports = PRETTIER_PARSER_MODULES[lang as LanguagesType];
-  const modules = await Promise.all(
-    dynamicImports.map((dynamicImport) => dynamicImport()),
-  );
-  return modules;
-}
-
-async function loadPrettierFormat() {
-  const {format} = await import('prettier/standalone.js');
-  return format;
+function loadPrettierParserByLang(lang: string) {
+  return PRETTIER_PARSER_MODULES[lang as LanguagesType];
 }
 
 const PRETTIER_OPTIONS_BY_LANG: Record<string, Options> = {
@@ -94,13 +85,10 @@ export function PrettierButton({lang, editor, getCodeDOMNode}: Props) {
     }
 
     try {
-      const format = await loadPrettierFormat();
       const options = getPrettierOptions(lang);
-      const prettierParsers = await loadPrettierParserByLang(lang);
-      options.plugins = prettierParsers.map(
-        (parser) => parser.default || parser,
-      );
-      const formattedCode = await format(content, options);
+      const prettierParsers = loadPrettierParserByLang(lang);
+      options.plugins = [...prettierParsers];
+      const formattedCode = format(content, options);
 
       editor.update(() => {
         const codeNode = $getNearestNodeFromDOMNode(codeDOMNode);
