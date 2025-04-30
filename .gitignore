@@ -37,3 +37,7 @@ npm-debug.log*
 .idea/**/shelf
 
 .idea
+
+# TMO
+
+!packages/tmo-lexical-editor/dist
