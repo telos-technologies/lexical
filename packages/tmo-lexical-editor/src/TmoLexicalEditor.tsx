@@ -234,7 +234,7 @@ function App(): JSX.Element {
   );
 }
 
-export default function TmoLexicalEditor(): JSX.Element {
+export function TmoLexicalEditor(): JSX.Element {
   return (
     <SettingsContext>
       <FlashMessageContext>

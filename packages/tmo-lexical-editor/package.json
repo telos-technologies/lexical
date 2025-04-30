@@ -1,5 +1,5 @@
 {
-  "name": "tmo-lexical-editor",
+  "name": "@tmo/tmo-lexical-editor",
   "version": "0.30.0",
   "type": "module",
   "dependencies": {
@@ -31,6 +31,23 @@
   "peerDependencies": {
     "react": ">=17.x",
     "react-dom": ">=17.x"
+  },
+  "exports": {
+    "./TmoLexicalEditor": {
+      "import": {
+        "types": "./TmoLexicalEditor.d.ts",
+        "development": "./TmoLexicalEditor.dev.mjs",
+        "production": "./TmoLexicalEditor.prod.mjs",
+        "node": "./TmoLexicalEditor.node.mjs",
+        "default": "./TmoLexicalEditor.mjs"
+      },
+      "require": {
+        "types": "./TmoLexicalEditor.d.ts",
+        "development": "./TmoLexicalEditor.dev.js",
+        "production": "./TmoLexicalEditor.prod.js",
+        "default": "./TmoLexicalEditor.js"
+      }
+    }
   },
   "sideEffects": false
 }
